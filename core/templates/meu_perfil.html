@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil</title>
+    <!-- {% load static %} -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container my-4">
+        <header class="text-center">
+            <h1 class="display-4">Meu Perfil</h1>
+            {% csrf_token %}
+            <nav>
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item"><a class="nav-link" href="#meu_perfil">Meu Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#editar">Editar Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-success text-white"
+                            href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div class="d-flex justify-content-center m-4">
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img src="../../media/perfil/profile_photo.jpg" class="card-img" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Nome: {{ leitor.nome }}</h5>
+                            <p class="card-text">Unidade: Biblioteca Municipal de São Sebastião</p>
+                            <p class="card-text">Telefone: {{ leitor.email }}</p>
+                            <p class="card-text">E-mail: {{ leitor.telefone }}</p>
+                            <p class="card-text">Endereço:</p>
+                            <p class="card-text">Situação: NORMAL</p>
+                            <p class="card-text"><small class="text-muted">Validade: 31/12/2024</small></p>
+                            <button type="button" class="btn btn-warning">Renovar Matrícula</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center m-4">
+            <div class="card mb-3" style="max-width: 840px;">
+                <h3 class="text-center">Situação do Usuário</h3>
+                <h5 class="m-2 lead">2 Empréstimos em Aberto</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Qt. Renovação</th>
+                            <th scope="col">Descri. da Obra</th>
+                            <th scope="col">Dt. Empréstimo </th>
+                            <th scope="col">Dt. Devolução</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Harry Potter e a Pedra Filosofal: 1</td>
+                            <td>14 Jan 2022</td>
+                            <td>14 Jan 2022</td>
+                            <td><button type="button" class="btn btn-warning">Renovar</button></td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Harry Potter e a Câmara Secreta: 2</td>
+                            <td>14 Jan 2022</td>
+                            <td>14 Jan 2022</td>
+                            <td><button type="button" class="btn btn-warning">Renovar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="d-flex justify-content-center m-4">
+            <div class="card mb-3" style="max-width: 540px;">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">0 Obra(s) Reservada(s)</li>
+                    <li class="list-group-item">0 Obra(s) em Espera para ser retiradas na Biblioteca</li>
+                    <li class="list-group-item">0 Multas Pendentes</li>
+                </ul>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center m-4">
+            <div class="btn-group mt-4" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-warning mr-2">Histórico de Empréstimos</button>
+                <button type="button" class="btn btn-warning mr-2">Sugestão de Títulos</button>
+                <button type="button" class="btn btn-warning mr-2">Alterar Senha</button>
+                <button type="button" class="btn btn-warning mr-2">Alterar Cadastro</button>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center m-4">
+            <div class="container">
+                <h3 class="text-center p-4">Meus Livros Favoritos</h3>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card" style="width: 15rem;">
+                            <img src="../../media/livro_1.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Nem te conto - Emily Henry</h5>
+                                <a href="#" class="btn btn-warning">Tirar dos Favoritos</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card" style="width: 15rem;">
+                            <img src="../../media/livro_22.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">O Bolo de Natal - Elza Fiúza</h5>
+                                <a href="#" class="btn btn-warning">Tirar dos Favoritos</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card" style="width: 15rem;">
+                            <img src="../../media/livro_3.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Kafka à Beira-mar - Haruki Murakami</h5>
+                                <a href="#" class="btn btn-warning">Tirar dos Favoritos</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

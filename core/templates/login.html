@@ -3,19 +3,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Meta viewport para garantir responsividade em dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
-    <!-- Link para o CSS do Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Link para CSS personalizado com a tag estática do Django -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    
     <style>
         body {
-            /* Carrega a imagem de fundo de forma compatível com o Django */
-            background-image: url("{% static 'images/cp.jpg' %}"); 
+            background-image: url('{% static 'images/cp.jpg' %}'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -26,13 +20,11 @@
         }
         .login-container {
             max-width: 400px;
+            margin-top: 10%;
             padding: 2rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             background-color: #ffffff;
-        }
-        .form-control {
-            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -42,56 +34,28 @@
             <h2 class="text-center mb-4">Login</h2>
 
             <!-- Formulário de login -->
-            <form method="post" action="{% url 'login' %}">
+            <form method="post">
                 {% csrf_token %} <!-- Token CSRF obrigatório para POST seguro -->
 
-                <!-- Campo de Email -->
-                <div class="form-group">
-                    {{ form.email.label }}
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in form.email.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
+                <!-- Renderiza o formulário com os campos do Django -->
+                {{ form.as_p }} 
 
-                <!-- Campo de Senha -->
-                <div class="form-group">
-                    {{ form.password.label }}
-                    {{ form.password }}
-                    {% if form.password.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in form.password.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                <!-- Checkbox para "Continuar logado" -->
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                    <label class="form-check-label" for="remember_me">Continuar logado</label>
                 </div>
 
                 <!-- Botão de envio -->
                 <button type="submit" class="btn btn-primary btn-block">Entrar</button>
             </form>
 
-            <!-- Exibe mensagens gerais de erro -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-danger mt-3">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
-            <!-- Link para página de registro -->
-            <p class="mt-3 text-center">
-                Não tem uma conta? <a href="{% url 'register' %}">Registre-se aqui</a>
-            </p>
+            <p class="mt-3 text-center">Não tem uma conta? <a href="{% url 'register' %}">Registre-se aqui</a></p>
         </div>
     </div>
-
-    <!-- Scripts JavaScript -->
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0v8FqC5e4pUm8VfYYc9v+hJ3DHTK5tO1R6xyL1HnJWeScX2V" crossorigin="anonymous"></script>
 </body>
 </html>

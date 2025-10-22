@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'library_app',
     'bootstrap5',
     'storages',  # django-storages para integração com AWS S3
     'csp',  # Adicionado para Content Security Policy
@@ -31,9 +32,8 @@ INSTALLED_APPS = [
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
-    'csp.middleware.CSPMiddleware',  # Adicionado para Content Security Policy
-    'django.middleware.http.ConditionalGetMiddleware',  # Middleware condicional para cache
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,7 +74,6 @@ DATABASES = {
     }
 }
 
-# Configuração do banco de dados no Heroku usando JAWSDB_URL
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
@@ -95,7 +94,7 @@ else:
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
-# Configuração de cache usando apenas LocMemCache
+# Configuração de cache
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -103,10 +102,8 @@ CACHES = {
     }
 }
 
-# Configuração de sessão
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Validação de senha
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -114,7 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Configurações de internacionalização e fuso horário
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
@@ -122,48 +118,46 @@ USE_TZ = True
 
 # Configuração de arquivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Configuração de arquivos de mídia
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# Diretório onde os arquivos estáticos serão armazenados após o comando `collectstatic`
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Usando o WhiteNoise para servir arquivos estáticos em produção
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
+
+# Configuração de arquivos de mídia (S3)
+MEDIA_URL = 'https://{AWS_S3_CUSTOM_DOMAIN}/media/'  # Usando o domínio customizado S3
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Isso será ignorado em produção se S3 estiver ativo
 
 if not DEBUG:
-    # Configuração para Amazon S3
+    # Configuração para armazenar no S3
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_QUERYSTRING_AUTH = False
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')  # Configuração da região do bucket
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    AWS_QUERYSTRING_AUTH = False  # Evita URL temporárias para os arquivos
 
-# Configuração para campo padrão de chaves primárias
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Codificação padrão
 DEFAULT_CHARSET = 'utf-8'
 
-# Configuração do usuário personalizado
+# Configuração de usuários e autenticação
 AUTH_USER_MODEL = 'core.Leitor'
 
-# Configuração de autenticação e redirecionamento
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-# Segurança dos cookies e HTTPS
+# Configuração de cookies para segurança em produção
 SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 
-# Cabeçalhos de segurança
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
@@ -212,20 +206,28 @@ from django.utils.deprecation import MiddlewareMixin
 
 class CacheControlMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
+        if request.path.startswith('/login/') or request.path.startswith('/perfil/'):
+            # Evita cache em páginas dinâmicas de login e perfil
+            patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+        elif request.path.startswith('/static/'):
+            # Cache prolongado para arquivos estáticos
+            patch_cache_control(response, public=True, max_age=WHITENOISE_MAX_AGE, immutable=True)
+        else:
+            # Cache de longa duração para páginas mais estáticas
+            patch_cache_control(response, public=True, max_age=3600)  # Cache para 1 hora ou mais
+
         return response
 
-# Adicione CacheControlMiddleware ao final da lista de middlewares
 MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
 
-# Logging Configurations
+# Configuração de logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG'
+            'level': 'DEBUG' if DEBUG else 'ERROR',
         },
     },
     'root': {

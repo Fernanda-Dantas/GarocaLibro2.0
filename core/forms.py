@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from .models import Categoria, Leitor, Livro, Emprestimo, Agendamento
+from django.utils import timezone
 
 class CategoriaModelForm(forms.ModelForm):
     """Formulário para criar ou editar uma Categoria."""
@@ -23,9 +24,10 @@ class LeitorModelForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'Senha'
         }),
-        required=True
+        required=True,
+        label="Senha"
     )
-    
+
     class Meta:
         model = Leitor
         fields = ['nome', 'telefone', 'email', 'password', 'foto_perfil', 'endereco']  # Added foto_perfil and endereco
@@ -53,18 +55,14 @@ class LeitorModelForm(forms.ModelForm):
         }
 
     def clean_email(self):
-        """Valida o e-mail para garantir que não esteja em uso e seja válido."""
+        """Valida o e-mail para garantir que não esteja em uso."""
         email = self.cleaned_data.get('email')
-        if not email:
-            raise ValidationError("Este campo é obrigatório.")
-        if not isinstance(email, str) or email.strip() == '':
-            raise ValidationError("O email não pode ser vazio.")
         if Leitor.objects.filter(email=email).exists():
             raise ValidationError("Este email já está cadastrado.")
         return email
 
     def save(self, commit=True):
-        """Salva o Leitor de forma segura com a senha criptografada."""
+        """Salva o Leitor com a senha criptografada."""
         leitor = super().save(commit=False)
         leitor.set_password(self.cleaned_data['password'])  # Criptografa a senha
         if commit:
@@ -115,9 +113,18 @@ class EmprestimoModelForm(forms.ModelForm):
             'devolucao': forms.DateTimeInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Data e Hora de Devolução',
-                'type': 'datetime-local'  # Suporte para data e hora
+                'type': 'datetime-local'
             }),
         }
+
+    def clean_devolucao(self):
+        """Valida se a data de devolução é futura."""
+        devolucao = self.cleaned_data.get('devolucao')
+        if devolucao is None:
+            return devolucao
+        if devolucao <= timezone.now():
+            raise ValidationError("A data de devolução deve ser futura.")
+        return devolucao
 
 class LoginForm(forms.Form):
     """Formulário de Login com validação de e-mail e senha."""
@@ -143,15 +150,10 @@ class LoginForm(forms.Form):
         email = cleaned_data.get("email")
         password = cleaned_data.get("password")
         
-        # Verifique se o e-mail existe e a senha corresponde
         if email and password:
-            try:
-                user = Leitor.objects.get(email=email)
-                if not user.check_password(password):  # Verifica a senha
-                    raise forms.ValidationError("Senha incorreta.")
-            except Leitor.DoesNotExist:
-                raise forms.ValidationError("Este e-mail não está registrado.")
-        
+            user = authenticate(email=email, password=password)
+            if not user:
+                raise forms.ValidationError("Credenciais inválidas. Verifique o email e a senha.")
         return cleaned_data
 
 class AgendamentoForm(forms.ModelForm):

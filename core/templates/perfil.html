@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil do Leitor</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <!-- Link corrigido para o arquivo CSS -->
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
             <h1 class="display-4">Perfil do Leitor</h1>
             <nav>
                 <ul class="nav nav-pills justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="#perfil">Meu Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#meu_perfil">Meu Perfil</a></li>
                     <li class="nav-item"><a class="nav-link" href="#editar">Editar Perfil</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-success text-white" href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
                 </ul>
@@ -28,9 +28,11 @@
                 <div class="perfil-info d-flex align-items-center">
                     <div class="foto-container mr-3">
                         {% if leitor.foto_perfil %}
-                            <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
+                         <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
                         {% else %}
-                            <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;">
+                        <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;">
+                    
+
                         {% endif %}
                     </div>
                     <div class="informacoes">
@@ -47,15 +49,15 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="nome">Nome:</label>
-                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo" value="{{ leitor.nome }}">
+                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo">
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email" required placeholder="capitu@bentinho.com.br" value="{{ leitor.email }}">
+                        <input type="email" class="form-control" id="email" name="email" required placeholder="capitu@bentinho.com.br">
                     </div>
                     <div class="form-group">
                         <label for="telefone">Telefone:</label>
-                        <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14" value="{{ leitor.telefone }}">
+                        <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14">
                     </div>
                     <div class="form-group mt-5 mb-5">
                         <label for="foto"><strong>Foto de Perfil:</strong></label>
@@ -66,7 +68,7 @@
             </section>
 
             <section id="logout" class="text-center">
-                <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+                <button id="logout-button" class="btn btn-danger">Sair</button>
             </section>
         </main>
     </div>

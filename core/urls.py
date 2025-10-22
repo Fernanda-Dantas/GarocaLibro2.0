@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from core.views import (
-    IndexView,
+    AppGarocaView,
     LeitorListView,
     LeitorCreateView,
     LeitorUpdateView,
@@ -19,12 +19,14 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
+    home_view,  # Mantém home_view
     api_devolver_livro,
     devolver_livro_view,
 )
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
+    path('', home_view, name='home'),  # A URL principal agora está correta
+    path('appgaroca/', AppGarocaView.as_view(), name='appgaroca'),
     path('leitores/', LeitorListView.as_view(), name='leitor-list'),
     path('leitor/add/', LeitorCreateView.as_view(), name='leitor-create'),
     path('leitor/edit/<int:pk>/', LeitorUpdateView.as_view(), name='leitor-update'),
@@ -37,6 +39,7 @@ urlpatterns = [
     path('emprestimo/add/', EmprestimoCreateView.as_view(), name='emprestimo-create'),
     path('livros/view/', livros_view, name='livros-view'),
     path('perfil/', perfil_view, name='perfil'),
+    path('meu_perfil/', perfil_view, name='meu_perfil'),
     path('login/', login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),

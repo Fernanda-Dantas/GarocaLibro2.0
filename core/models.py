@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils import timezone
 from django.forms import ValidationError
-from datetime import datetime
+from datetime import date
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from decimal import Decimal
 
 # Classe Base
 class Base(models.Model):
@@ -18,7 +19,7 @@ class LeitorManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('O email deve ser fornecido')
-        email = self.model.normalize_email(email)  # O normalize_email já é feito aqui
+        email = self.model.normalize_email(email)
         leitor = self.model(email=email, **extra_fields)
         leitor.set_password(password)
         leitor.save(using=self._db)
@@ -35,13 +36,27 @@ class LeitorManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-
+# Classe Leitor
 class Leitor(Base, AbstractBaseUser, PermissionsMixin):
     nome = models.CharField('Nome', max_length=50)
-    telefone = models.CharField('Telefone', max_length=15)  # Ajuste o tamanho conforme necessário
+    telefone = models.CharField('Telefone', max_length=15)
     email = models.EmailField('Email', max_length=50, unique=True)
     endereco = models.CharField('Endereço', max_length=255, blank=True, null=True)
     foto_perfil = models.ImageField('Foto de Perfil', upload_to='perfil/', blank=True, null=True)
+
+    # Campos financeiros
+    balance = models.DecimalField(
+        'Saldo',
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
+    fee = models.DecimalField(
+        'Taxa',
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
 
     # Campos de controle de acesso
     is_staff = models.BooleanField(default=False)
@@ -52,19 +67,18 @@ class Leitor(Base, AbstractBaseUser, PermissionsMixin):
 
     objects = LeitorManager()
 
-    @classmethod
-    def normalize_email(cls, email):
-        """
-        Normalize the email address by lowercasing the domain part of it.
-        """
-        email = email or ""
-        try:
-            email_name, domain_part = email.strip().rsplit("@", 1)
-        except ValueError:
-            pass
-        else:
-            email = email_name.lower() + "@" + domain_part.lower()
-        return email
+    def clean(self):
+        """Validações personalizadas antes de salvar o objeto."""
+        super().clean()
+        if not self.telefone.isdigit():
+            raise ValidationError("O telefone deve conter apenas números.")
+        if len(self.telefone) < 10:
+            raise ValidationError("O telefone deve ter pelo menos 10 dígitos.")
+
+    def save(self, *args, **kwargs):
+        """Sobrescreve o método save para garantir validações."""
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
@@ -95,14 +109,24 @@ class Livro(Base):
     autor = models.CharField('Autor', max_length=100, default='Desconhecido')
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     status = models.BooleanField('Status', choices=STATUS_CHOICE, default=True)
-    capa = models.ImageField('Capa do Livro', upload_to='livros/capas/', null=True, blank=True)
+    isbn = models.CharField('ISBN', max_length=13, unique=True, blank=True, null=True)
+    ano_publicacao = models.PositiveIntegerField('Ano de Publicação', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Livro'
         verbose_name_plural = 'Livros'
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.codigo}) - {self.autor}"
+
+    def is_available(self):
+        """
+        Verifica se o livro está disponível para empréstimo.
+        Retorna False se o status for 'Indisponível' ou se houver um empréstimo ativo.
+        """
+        if not self.status:
+            return False
+        return not Emprestimo.objects.filter(livro=self, status='in_progress').exists()
 
 # Classe Emprestimo
 class Emprestimo(Base):
@@ -111,17 +135,33 @@ class Emprestimo(Base):
         ('completed', 'Finalizado')
     )
 
-    devolucao = models.DateTimeField('Data de devolução', help_text="Selecione uma data e hora posterior à atual")
+    issue_date = models.DateField('Data de Empréstimo')
+    return_date = models.DateField('Data de Devolução', blank=True, null=True)
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICE, default='in_progress')
     leitor = models.ForeignKey(Leitor, on_delete=models.CASCADE)
     livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
 
+    MULTA_POR_DIA = 1.0  # Valor da multa por dia de atraso
+
+    def calcular_multa(self):
+        """
+        Calcula a multa com base no atraso na devolução.
+        """
+        if not self.return_date or self.return_date <= self.issue_date:
+            return 0  # Sem multa se não houver data de devolução ou se não houver atraso
+
+        dias_atraso = (self.return_date - self.issue_date).days
+        if dias_atraso > 0:
+            return dias_atraso * self.MULTA_POR_DIA
+        return 0
+
     def clean(self):
-        if self.devolucao <= timezone.now():
-            raise ValidationError('A data de devolução deve ser uma data futura.')
+        """Validações personalizadas para empréstimos."""
+        if self.return_date and self.return_date <= self.issue_date:
+            raise ValidationError('A data de devolução deve ser posterior à data de empréstimo.')
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # Garante que a validação seja aplicada ao salvar
+        self.full_clean()
         super().save(*args, **kwargs)
 
     class Meta:
@@ -148,7 +188,7 @@ class Agendamento(Base):
             raise ValidationError('A data de retirada deve ser uma data futura.')
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # Garante que a validação seja aplicada ao salvar
+        self.full_clean()
         super().save(*args, **kwargs)
 
     class Meta:

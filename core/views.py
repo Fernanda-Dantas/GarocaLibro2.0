@@ -1,29 +1,31 @@
 import logging
-from django.views import View
+from datetime import datetime, date
 from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from core.forms import LoginForm, LeitorModelForm, AgendamentoForm, LivroModelForm
-from core.models import Emprestimo, Leitor, Livro 
-from django.utils.timezone import make_aware
-from datetime import datetime, date
 from django.http import JsonResponse
+from django.utils.timezone import make_aware
+from core.forms import LoginForm, LeitorModelForm, AgendamentoForm, LivroModelForm
+from core.models import Emprestimo, Leitor, Livro, Agendamento
 
 # Configura o logger
 logger = logging.getLogger(__name__)
 
-# Páginas principais
-class IndexView(TemplateView):
-    template_name = 'index.html'
+# Página principal - Home
 
+def home_view(request):
+    return render(request, 'home.html')
+
+# Página adicional renomeada - AppGaroca
+class AppGarocaView(TemplateView):
+    template_name = 'appgaroca.html'
 
 # Visualizações relacionadas ao Leitor
 class LeitorListView(TemplateView):
     template_name = 'leitor-list.html'
-
 
 class LeitorCreateView(CreateView):
     model = Leitor
@@ -31,25 +33,21 @@ class LeitorCreateView(CreateView):
     template_name = 'leitor.html'
     success_url = reverse_lazy('leitor-list')
 
-
 class LeitorUpdateView(UpdateView):
     model = Leitor
     form_class = LeitorModelForm
     template_name = 'leitor.html'
     success_url = reverse_lazy('leitor-list')
 
-
 class LeitorDeleteView(DeleteView):
     model = Leitor
     template_name = 'leitor_confirm_delete.html'
     success_url = reverse_lazy('leitor-list')
 
-
 # Visualizações relacionadas ao Livro
 class LivroListView(TemplateView):
     template_name = 'livro-list.html'
     context_object_name = 'livros'
-
 
 class LivroCreateView(CreateView):
     model = Livro
@@ -57,31 +55,20 @@ class LivroCreateView(CreateView):
     template_name = 'livro.html'
     success_url = reverse_lazy('livro-list')
 
-    def form_valid(self, form):
-        form.instance.capa = self.request.FILES.get('capa')
-        return super().form_valid(form)
-
-
 class LivroUpdateView(UpdateView):
     model = Livro
     form_class = LivroModelForm
     template_name = 'livro.html'
     success_url = reverse_lazy('livro-list')
 
-    def form_valid(self, form):
-        if 'capa' in self.request.FILES:
-            form.instance.capa = self.request.FILES['capa']
-
 class LivroDeleteView(DeleteView):
     model = Livro
     template_name = 'livro_confirm_delete.html'
     success_url = reverse_lazy('livro-list')
 
-
 # Visualizações relacionadas ao Emprestimo
 class EmprestimoListView(TemplateView):
     template_name = 'emprestimo-list.html'
-
 
 class EmprestimoCreateView(CreateView):
     model = Emprestimo
@@ -95,21 +82,18 @@ class EmprestimoCreateView(CreateView):
             form.instance.devolucao = make_aware(datetime.combine(devolucao, datetime.min.time()))
         return super().form_valid(form)
 
-
 # Visualização de reservas
 @login_required
 def reservas_view(request):
     reservas = Emprestimo.objects.filter(leitor=request.user.leitor)
     return render(request, 'reservas.html', {'reservas': reservas})
 
-
 # Listagem de livros
 def livros_view(request):
     livros = Livro.objects.all()
     return render(request, 'livros.html', {'livros': livros})
 
-
-# Função de registro
+# Função de registro de novo leitor
 def register(request):
     if request.method == 'POST':
         form = LeitorModelForm(request.POST)
@@ -124,32 +108,22 @@ def register(request):
         form = LeitorModelForm()
     return render(request, 'register.html', {'form': form})
 
-
 # Função de login
-from django.http import HttpResponse
-
 def login_view(request):
     form = LoginForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('perfil')
+        else:
+            messages.error(request, "Credenciais inválidas.")
     
-    if request.method == "POST":
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('perfil')
-            else:
-                messages.error(request, "Credenciais inválidas.")
-                
-    # Renderiza o formulário de login
     response = render(request, 'login.html', {'form': form})
-    
-    # Desabilitar cache para a página de login
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
-    
     return response
-
 
 # Função para exibir perfil do usuário logado
 @login_required
@@ -160,7 +134,6 @@ def perfil_view(request):
     except Exception as e:
         logger.error(f"Erro ao carregar o perfil: {str(e)}")
         return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
-
 
 # Função para editar perfil
 @login_required
@@ -175,7 +148,6 @@ def editar_perfil_view(request):
     else:
         form = LeitorModelForm(instance=leitor)
     return render(request, 'editar_perfil.html', {'form': form})
-
 
 # API para retornar dados do leitor
 @login_required
@@ -193,12 +165,10 @@ def api_leitor(request):
         logger.error(f"Erro ao retornar dados do leitor: {str(e)}")
         return JsonResponse({'error': 'Erro ao recuperar dados.'}, status=500)
 
-
 # Função para agendar retirada de livros
 @login_required
 def agendar_retirada(request):
     livros_list = Livro.objects.filter(status=True)
-    
     if request.method == 'POST':
         form = AgendamentoForm(request.POST)
         if form.is_valid():
@@ -207,7 +177,6 @@ def agendar_retirada(request):
                 agendamento = form.save(commit=False)
                 agendamento.leitor = request.user
                 agendamento.save()
-
                 livro_selecionado.status = False
                 livro_selecionado.save()
                 return redirect('perfil')
@@ -215,9 +184,7 @@ def agendar_retirada(request):
                 form.add_error('livro', 'Este livro já foi reservado.')
     else:
         form = AgendamentoForm()
-
     return render(request, 'agendar_retirada.html', {'form': form, 'livros_list': livros_list})
-
 
 # Função de sucesso ao agendar retirada
 def success(request):
@@ -245,7 +212,7 @@ def api_devolver_livro(request, emprestimo_id):
         return JsonResponse({
             'message': 'Livro devolvido com sucesso!',
             'livro': {
-                'id': livro.id,
+                'id': livro.pk,
                 'nome': livro.nome,
                 'status': 'Disponível'
             }
