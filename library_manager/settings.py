@@ -22,8 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'library_app',
-    'bootstrap5',
+    #'library_app',
+    'django_bootstrap5',
     'storages',  # django-storages para integração com AWS S3
     'csp',  # Adicionado para Content Security Policy
     'django_extensions',
@@ -65,32 +65,28 @@ TEMPLATES = [
 # Configuração do banco de dados
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',  # banco padrão para desenvolvimento
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-ja_database_url = os.getenv('JAWSDB_URL')
-if ja_database_url:
-    DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
-else:
-    # Banco de dados local
-    if DEBUG and os.getenv('DB_ENGINE', '') == 'django.db.backends.mysql':
-        DATABASES['default'].update({
-            'NAME': 'DJANGO_G',
-            'USER': 'djangoadmin',  # ou o usuário correto
-            'PASSWORD': '100902',  # a senha correta do banco de dados
-            'HOST': 'localhost',
-            'PORT': '3306',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            }
-        })
+# Configuração do banco de dados baseada em variáveis de ambiente
+database_url = os.getenv('JAWSDB_URL')
+if database_url is not None and database_url != '':
+    DATABASES['default'] = dict(dj_database_url.parse(database_url))
+elif DEBUG and os.getenv('DB_ENGINE') == 'django.db.backends.mysql':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'DJANGO_G',
+        'USER': 'djangoadmin',
+        'PASSWORD': '100902',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
+    }
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
@@ -162,43 +158,37 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Configuração para Content-Security-Policy (CSP)
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    'https://stackpath.bootstrapcdn.com',
-    'https://code.jquery.com',
-    'https://cdn.jsdelivr.net',
-    'https://cdnjs.cloudflare.com',
-    "'unsafe-inline'",  # Permite scripts inline (necessário para <script>...</script>)
-)
-CSP_STYLE_SRC = (
-    "'self'",
-    'https://stackpath.bootstrapcdn.com',
-    'https://cdnjs.cloudflare.com',
-    'https://cdn.jsdelivr.net',
-    "'unsafe-inline'",  # Permite estilos inline
-)
-CSP_FRAME_ANCESTORS = ("'self'",)
-CSP_FONT_SRC = (
-    "'self'",
-    'https://cdnjs.cloudflare.com',
-    'https://cdn.jsdelivr.net',
-    'https://stackpath.bootstrapcdn.com',
-    'data:',
-)
-CSP_IMG_SRC = (
-    "'self'",
-    'blob:',
-    'data:',
-)
-CSP_WORKER_SRC = (
-    "'self'",
-    'blob:',
-)
-CSP_CHILD_SRC = (
-    "'self'",
-    'blob:',
-)
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "child-src": ("'self'", "blob:"),
+        "default-src": ("'self'",),
+        "font-src": (
+            "'self'",
+            "https://cdnjs.cloudflare.com",
+            "https://cdn.jsdelivr.net",
+            "https://stackpath.bootstrapcdn.com",
+            "data:",
+        ),
+        "frame-ancestors": ("'self'",),
+        "img-src": ("'self'", "blob:", "data:"),
+        "script-src": (
+            "'self'",
+            "https://stackpath.bootstrapcdn.com",
+            "https://code.jquery.com",
+            "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com",
+            "'unsafe-inline'",
+        ),
+        "style-src": (
+            "'self'",
+            "https://stackpath.bootstrapcdn.com",
+            "https://cdnjs.cloudflare.com",
+            "https://cdn.jsdelivr.net",
+            "'unsafe-inline'",
+        ),
+        "worker-src": ("'self'", "blob:"),
+    }
+}
 
 # Middleware para adicionar cabeçalho Cache-Control simplificado
 from django.utils.cache import patch_cache_control
