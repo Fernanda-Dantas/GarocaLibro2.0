@@ -1,125 +1,178 @@
+/* ===============================
+   🌅 ESTILO GERAL DA PÁGINA INICIAL
+   =============================== */
+
 body {
-    font-family: 'Arial', sans-serif;
-    background-image: url('/static/core/cp.jpg'); /* Referência para a imagem de fundo */
-    background-size: cover; /* Faz a imagem cobrir todo o fundo */
-    background-position: center; /* Centraliza a imagem */
-    background-repeat: no-repeat; /* Evita a repetição da imagem */
-    color: #333;
+    font-family: 'Poppins', 'Arial', sans-serif;
+    background-image: url('/static/core/cp.jpg'); /* Fundo com imagem personalizada */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #2c3e50;
     margin: 0;
     padding: 0;
-    text-align: center;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100vh; /* Altura total da tela */
+    align-items: center;
 }
 
-h1 {
-    font-size: 3em;
-    margin-bottom: 30px;
-    color: #34495e;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-}
+/* ===============================
+   🏠 CONTAINER PRINCIPAL
+   =============================== */
 
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
+    text-align: center;
     width: 90%;
-    max-width: 800px;
-    margin: 40px auto; /* Centraliza o container na página */
-    background-color: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente */
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    max-width: 600px;
+    backdrop-filter: blur(4px);
 }
+
+/* ===============================
+   ✨ TÍTULO PRINCIPAL
+   =============================== */
+
+h1 {
+    font-size: 2.8em;
+    margin-bottom: 25px;
+    color: #1f3a93;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===============================
+   🧍 PERFIL E IMAGEM
+   =============================== */
 
 .perfil-info {
     display: flex;
-    align-items: center; /* Alinha o início dos itens na vertical */
-    margin: 20px 0; /* Espaçamento vertical entre seções */
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .foto-perfil {
-    margin-right: 20px;
-    border-radius: 50%; /* Imagem de perfil circular */
-    width: 150px; /* Tamanho da imagem */
-    height: 150px; /* Tamanho da imagem */
-    object-fit: cover; /* Ajusta a imagem para preencher a moldura */
-    
-    /* Moldura decorativa */
-    border: 5px solid #3498db; /* Cor da borda (moldura) */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra ao redor da moldura */
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #3498db;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-
 
 .informacoes p {
-    margin: 5px 0;
-    font-size: 1.2em; /* Aumentado para melhor legibilidade */
-    color: #555;
+    margin: 6px 0;
+    font-size: 1.1em;
+    color: #34495e;
 }
+
+/* ===============================
+   🔘 BOTÕES
+   =============================== */
 
 button, a {
-    background-color: #3498db; /* Cor azul do botão */
-    color: white; /* Cor do texto */
-    border: none; /* Remove bordas */
-    padding: 05px 12px; /* Reduz o tamanho do botão */
-    margin: 10px; /* Ajusta o espaçamento entre os botões */
-    font-size: 1.2em; /* Tamanho da fonte */
-    cursor: pointer; /* Cursor pointer */
-    border-radius: 5px; /* Bordas arredondadas */
-    transition: background-color 0.3s, transform 0.3s; /* Efeitos de transição */
-    box-shadow: none; /* Remove qualquer sombra */
-    text-decoration: none; /* Remove o sublinhado do link */
-    display: inline-block; /* Permite margens e padding */
-    outline: none; /* Remove a borda ao clicar */
-}
-
-button:focus, a:focus {
-    outline: none; /* Remove a borda ao focar no botão */
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    margin: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
 }
 
 button:hover, a:hover {
-    background-color: #2980b9; /* Cor ao passar o mouse */
-    transform: translateY(-2px); /* Efeito de elevação */
+    background-color: #2980b9;
+    transform: translateY(-2px);
 }
 
+button:focus, a:focus {
+    outline: none;
+}
 
-/* Estilo para o formulário de edição */
+/* ===============================
+   ✏️ FORMULÁRIOS
+   =============================== */
+
 form {
     margin: 20px 0;
+    text-align: left;
 }
 
 label {
     display: block;
     margin: 10px 0 5px;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
-input[type="text"], input[type="email"], input[type="file"] {
+input[type="text"],
+input[type="email"],
+input[type="file"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em; /* Tamanho da fonte para os inputs */
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
 }
 
-/* Responsividade */
+input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* ===============================
+   📱 RESPONSIVIDADE
+   =============================== */
+
 @media (max-width: 768px) {
     h1 {
-        font-size: 2em; /* Reduz o tamanho do título em telas pequenas */
+        font-size: 2em;
+    }
+
+    .container {
+        padding: 25px 15px;
     }
 
     .perfil-info {
-        flex-direction: column; /* Muda para coluna em telas menores */
-        align-items: center; /* Centraliza os itens */
+        flex-direction: column;
+        text-align: center;
     }
 
     .foto-perfil {
-        margin-bottom: 20px; /* Espaço abaixo da imagem de perfil */
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
     }
 
     button, a {
-        width: 90%; /* Botões ocupam 90% da largura em telas menores */
+        width: 100%;
+        font-size: 1em;
     }
+}
+
+/* ===============================
+   🌟 ANIMAÇÃO SUAVE NA ENTRADA
+   =============================== */
+
+.container {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }

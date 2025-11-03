@@ -1,0 +1,231 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Painel - GaroçáLibro</title>
+    {% bootstrap_css %}
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: "Poppins", sans-serif;
+        }
+        .dashboard {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #0d6efd;
+            object-fit: cover;
+        }
+        h3 {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+        }
+        table th, table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        .btn-primary, .btn-outline-secondary {
+            border-radius: 8px;
+        }
+        .section-title {
+            margin-top: 30px;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+        .badge {
+            font-size: 0.85em;
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+        .fade-out {
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <img src="{{ leitor.foto_perfil.url|default:'https://garoca1.s3.us-east-2.amazonaws.com/media/default-profile.png' }}" alt="Foto do leitor">
+            <div>
+                <h3>Olá, {{ leitor.nome }}</h3>
+                <small>{{ leitor.email }}</small>
+            </div>
+        </div>
+
+        <div class="text-end mb-3">
+            <a href="{% url 'agendar_retirada' %}" class="btn btn-primary">📘 Agendar Retirada</a>
+            <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">Editar Perfil</a>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SEÇÃO: MEUS AGENDAMENTOS -->
+        <!-- ============================== -->
+        <h5 class="section-title">📅 Meus Agendamentos</h5>
+        {% if agendamentos %}
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Livro</th>
+                        <th>Data Agendada</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for ag in agendamentos %}
+                    <tr id="agendamento-{{ ag.id }}">
+                        <td>{{ ag.livro.nome }}</td>
+                        <td>
+                            {% if ag.data_agendada %}
+                                {{ ag.data_agendada|date:"d/m/Y H:i" }}
+                            {% elif ag.criado %}
+                                {{ ag.criado|date:"d/m/Y H:i" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ag.status == 'scheduled' %}
+                                <span class="badge bg-warning text-dark">🕓 Agendado</span>
+                            {% elif ag.status == 'completed' %}
+                                <span class="badge bg-success">✅ Concluído</span>
+                            {% elif ag.status == 'cancelled' %}
+                                <span class="badge bg-danger">❌ Cancelado</span>
+                            {% else %}
+                                <span class="badge bg-secondary">📖 Pendente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ag.status == 'scheduled' %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="cancelarAgendamento({{ ag.id }})">
+                                    ❌ Cancelar
+                                </button>
+                            {% else %}
+                                <small class="text-muted">—</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">Nenhum agendamento encontrado.</p>
+        {% endif %}
+
+        <!-- ============================== -->
+        <!-- SEÇÃO: LIVROS EMPRESTADOS -->
+        <!-- ============================== -->
+        <h5 class="section-title">📚 Livros Emprestados</h5>
+        {% if emprestimos %}
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Livro</th>
+                        <th>Data Empréstimo</th>
+                        <th>Devolução</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for emp in emprestimos %}
+                    <tr>
+                        <td>{{ emp.livro.nome }}</td>
+                        <td>{{ emp.criado|date:"d/m/Y" }}</td>
+                        <td>{{ emp.devolucao|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if emp.status == 'completed' %}
+                                <span class="badge bg-success">✅ Devolvido</span>
+                            {% elif emp.status == 'in_progress' %}
+                                <span class="badge bg-info text-dark">📘 Em andamento</span>
+                            {% else %}
+                                <span class="badge bg-secondary">⚙️ {{ emp.status|default:"Desconhecido" }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">Nenhum livro emprestado no momento.</p>
+        {% endif %}
+    </div>
+
+    {% bootstrap_javascript %}
+
+    <!-- ============================== -->
+    <!-- SCRIPT: Cancelar agendamento -->
+    <!-- ============================== -->
+    <script>
+        function cancelarAgendamento(agendamentoId) {
+            if (!confirm("Tem certeza que deseja cancelar este agendamento?")) return;
+
+            fetch(`/core/agendamento/${agendamentoId}/cancelar/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ " + data.message);
+                    const row = document.getElementById(`agendamento-${agendamentoId}`);
+                    if (row) {
+                        row.classList.add("fade-out");
+                        setTimeout(() => {
+                            row.querySelector("td:nth-child(3)").innerHTML = '<span class="badge bg-danger">❌ Cancelado</span>';
+                            row.querySelector("td:nth-child(4)").innerHTML = '<small class="text-muted">—</small>';
+                            row.classList.remove("fade-out");
+                        }, 400);
+                    }
+                } else {
+                    alert("⚠️ " + (data.error || "Não foi possível cancelar o agendamento."));
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao cancelar:", error);
+                alert("Erro inesperado ao tentar cancelar o agendamento.");
+            });
+        }
+
+        // Função auxiliar para capturar o CSRF token (necessária para POST no Django)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Empréstimos</title>
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>📚 Meus Empréstimos</h2>
+        <a href="{% url 'dashboard_leitor' %}" class="btn btn-secondary">⬅ Voltar</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Data de Empréstimo</th>
+                    <th>Data de Devolução</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprestimo in emprestimos %}
+                <tr>
+                    <td>{{ emprestimo.livro.nome }}</td>
+                    <td>{{ emprestimo.criado|date:"d/m/Y" }}</td>
+                    <td>{{ emprestimo.devolucao|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if emprestimo.status == "completed" %}
+                            ✅ Devolvido
+                        {% else %}
+                            🔄 Em andamento
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Você ainda não possui empréstimos.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

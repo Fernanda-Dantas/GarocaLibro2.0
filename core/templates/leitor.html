@@ -1,31 +1,87 @@
-{% load bootstrap5 %}
+{% load django_bootstrap5 static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor</title>
+    <title>Cadastro de Leitor</title>
     {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/leitor.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Poppins", sans-serif;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #0d6efd;
+        }
+        .btn-primary {
+            border-radius: 8px;
+            padding: 10px 25px;
+        }
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 10px 25px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Leitor</h1>
-        {% bootstrap_messages %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            
-            <label for="id_nome">Nome</label>
-            <input id="id_nome" type="text" name="nome" placeholder="Digite o nome">
-        
-            <label for="id_telefone">Telefone</label>
-            <input id="id_telefone" type="text" name="telefone" placeholder="Digite o telefone">
-        
-            <button type="submit">Salvar</button>
-        </form>
-        
+    <div class="container mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">📘 Cadastro de Leitor</h3>
+                </div>
+                <div class="card-body">
+                    {% bootstrap_messages %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nome" class="form-label">Nome completo</label>
+                                <input type="text" name="nome" id="id_nome" class="form-control" placeholder="Digite o nome" value="{{ form.nome.value|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">E-mail</label>
+                                <input type="email" name="email" id="id_email" class="form-control" placeholder="Digite o e-mail" value="{{ form.email.value|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_telefone" class="form-label">Telefone</label>
+                                <input type="text" name="telefone" id="id_telefone" class="form-control" placeholder="(DDD) 99999-9999" value="{{ form.telefone.value|default:'' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password" class="form-label">Senha</label>
+                                <input type="password" name="password" id="id_password" class="form-control" placeholder="Digite uma senha segura">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+                            <button type="submit" class="btn btn-primary">💾 Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
     {% bootstrap_javascript %}
 </body>
 </html>

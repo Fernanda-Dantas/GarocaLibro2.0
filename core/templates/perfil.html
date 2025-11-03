@@ -1,76 +1,195 @@
-{% load static %}
+{% load django_bootstrap5 static %}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil do Leitor</title>
-    <!-- Link corrigido para o arquivo CSS -->
-    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Meu Perfil</title>
+    {% bootstrap_css %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .perfil-card {
+            max-width: 750px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .perfil-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .perfil-header img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #0d6efd;
+        }
+
+        .perfil-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+        }
+
+        .perfil-item label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .perfil-item span {
+            color: #212529;
+        }
+
+        .edit {
+            color: #0d6efd;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .btn-dashboard {
+            border-radius: 8px;
+            padding: 10px 25px;
+        }
+
+        .modal-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container my-4">
-        <header class="mb-4 text-center">
-            <h1 class="display-4">Perfil do Leitor</h1>
-            <nav>
-                <ul class="nav nav-pills justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="#meu_perfil">Meu Perfil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#editar">Editar Perfil</a></li>
-                    <li class="nav-item"><a class="nav-link btn btn-success text-white" href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
-                </ul>
-            </nav>
-        </header>
+    <div class="container">
+        <div class="perfil-card">
+            <div class="perfil-header">
+                <img id="fotoPerfil" 
+                    src="{% if leitor.foto_perfil %}{{ leitor.foto_perfil.url }}{% else %}https://garoca1.s3.us-east-2.amazonaws.com/media/default-profile.png{% endif %}" 
+                    alt="Foto de perfil">
 
-        <main>
-            <section id="perfil" class="mb-5">
-                <h2 class="h3">Informações do Perfil</h2>
-                <div class="perfil-info d-flex align-items-center">
-                    <div class="foto-container mr-3">
-                        {% if leitor.foto_perfil %}
-                         <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
-                        {% else %}
-                        <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;">
-                    
-
-                        {% endif %}
-                    </div>
-                    <div class="informacoes">
-                        <p><strong>Nome:</strong> <span id="nome-leitor">{{ leitor.nome }}</span></p>
-                        <p><strong>Email:</strong> <span id="email-leitor">{{ leitor.email }}</span></p>
-                        <p><strong>Telefone:</strong> <span id="telefone-leitor">{{ leitor.telefone }}</span></p>
+                <div>
+                    <h3 class="mb-0">{{ leitor.nome }}</h3>
+                    <small class="text-muted">{{ leitor.email }}</small>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal">
+                            ✏️ Editar Perfil
+                        </button>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section id="editar" class="mb-5">
-                <h2 class="h3">Editar Perfil</h2>
-                <form id="form-editar" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email" required placeholder="capitu@bentinho.com.br">
-                    </div>
-                    <div class="form-group">
-                        <label for="telefone">Telefone:</label>
-                        <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14">
-                    </div>
-                    <div class="form-group mt-5 mb-5">
-                        <label for="foto"><strong>Foto de Perfil:</strong></label>
-                        <input type="file" class="form-control-file" id="foto" name="foto" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-success text-white">Salvar Alterações</button>
-                </form>
-            </section>
+            <h5 class="mb-3 text-primary">Informações Pessoais</h5>
 
-            <section id="logout" class="text-center">
-                <button id="logout-button" class="btn btn-danger">Sair</button>
-            </section>
-        </main>
+            <div id="perfil-container">
+                <div class="perfil-item">
+                    <label>Nome</label>
+                    <span>{{ leitor.nome }}</span>
+                </div>
+
+                <div class="perfil-item">
+                    <label>Email</label>
+                    <span>{{ leitor.email }}</span>
+                </div>
+
+                <div class="perfil-item">
+                    <label>Telefone</label>
+                    <span>{{ leitor.telefone }}</span>
+                </div>
+
+                <div class="perfil-item">
+                    <label>CPF</label>
+                    <span>{{ leitor.cpf }}</span>
+                </div>
+
+                <div class="perfil-item">
+                    <label>Endereço</label>
+                    <span>{{ leitor.endereco }}</span>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'dashboard_leitor' %}" class="btn btn-outline-secondary btn-dashboard">⬅ Voltar ao Dashboard</a>
+            </div>
+        </div>
     </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarPerfilForm" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="{{ leitor.nome }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="telefone" name="telefone" value="{{ leitor.telefone }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="foto_perfil" class="form-label">Foto de Perfil</label>
+                            <input type="file" class="form-control" id="foto_perfil" name="foto_perfil" accept="image/*">
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% bootstrap_javascript %}
+    <script>
+        // Atualiza a imagem de perfil dinamicamente após salvar
+        document.getElementById("editarPerfilForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("{% url 'editar_perfil_ajax' %}", {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.foto_perfil) {
+                    document.getElementById("fotoPerfil").src = data.foto_perfil;
+                }
+                location.reload();
+            } else {
+                alert("Erro ao atualizar perfil. Tente novamente.");
+            }
+        });
+    </script>
 </body>
 </html>

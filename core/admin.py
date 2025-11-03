@@ -1,15 +1,18 @@
 from django.contrib import admin
 from .models import Categoria, Leitor, Livro, Emprestimo, Agendamento
 
+
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'criado', 'modificado', 'ativo')
+
 
 @admin.register(Leitor)
 class LeitorAdmin(admin.ModelAdmin):
     list_display = ('id', 'nome', 'email', 'telefone', 'criado', 'modificado', 'ativo')
     search_fields = ('nome', 'email')
     list_filter = ('ativo',)
+
 
 @admin.register(Livro)
 class LivroAdmin(admin.ModelAdmin):
@@ -20,18 +23,16 @@ class LivroAdmin(admin.ModelAdmin):
         ('Informações Básicas', {
             'fields': ('codigo', 'nome', 'autor', 'categoria')
         }),
-        ('Capa do Livro', {
-            'fields': ('capa',),
-            'classes': ('wide',)
-        }),
         ('Status', {
             'fields': ('status',)
         }),
     )
 
+
 @admin.register(Emprestimo)
 class EmprestimoAdmin(admin.ModelAdmin):
     list_display = ('leitor', 'livro', 'devolucao', 'status', 'criado', 'modificado', 'ativo')
+
 
 @admin.register(Agendamento)
 class AgendamentoAdmin(admin.ModelAdmin):

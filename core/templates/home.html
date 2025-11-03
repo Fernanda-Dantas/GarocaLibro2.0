@@ -1,170 +1,153 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Municipal de São Sebastião</title>
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- CSS local -->
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
 </head>
 
 <body>
     <!-- HEADER -->
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #fde68a;">
-        <a class="navbar-brand" href="https://fundass.com.br/">
-            <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/logo-fundass.png" alt="Logo">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#biblioteca">A Biblioteca</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" target="_blank"
-                        href="http://biblioteca.saosebastiao.sp.gov.br/Biblivre5/single/?action=search_bibliographic">Acervo</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#noticias">Notícias</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contato">Contato</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#faq">Perguntas Frequentes</a>
-                </li>
-                <li class="nav-item">
-                    <a target="_blank" class="nav-link"
-                        href="http://127.0.0.1:5500/GarocaLibro2.0/core/templates/login.html">GaroçáLibro</a>
-                </li>
-            </ul>
+        <div class="container">
+            <a class="navbar-brand" href="https://fundass.com.br/">
+                <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/logo-fundass.png" alt="Logo" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#biblioteca">A Biblioteca</a></li>
+                    <li class="nav-item"><a class="nav-link" target="_blank"
+                            href="http://biblioteca.saosebastiao.sp.gov.br/Biblivre5/single/?action=search_bibliographic">Acervo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#noticias">Notícias</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">Perguntas Frequentes</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-bold" href="{% url 'login' %}">📘 GaroçáLibro</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-    
+
     <!-- JUMBOTRON -->
     <section class="container-fluid bg-light text-dark py-5 mt-5">
         <div class="container d-flex flex-column flex-lg-row align-items-center">
             <div class="text-lg-left p-4 col-lg-6">
-                <h1 class="font-weight-bold titulo-principal">
-                    <span class="text-warning">Biblioteca e Videoteca Municipal</span> Álvaro Dória Orselli – “Seu
-                    Alvinho”
+                <h1 class="fw-bold">
+                    <span class="text-warning">Biblioteca e Videoteca Municipal</span> Álvaro Dória Orselli – “Seu Alvinho”
                 </h1>
                 <p class="mt-4 mb-5 h5">
-                    <strong>Horário de Funcionamento:</strong> de segunda a sexta-feira, das 8h às 18h.
+                    <strong>Horário de Funcionamento:</strong> Segunda a sexta-feira, das 8h às 18h.
                 </p>
             </div>
             <div class="d-flex justify-content-center align-items-center col-lg-6">
-                <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/biblioteca-ss.jpg" alt="Imagem da Biblioteca" class="img-fluid"
-                    style="max-height: 24rem;">
+                <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/biblioteca-ss.jpg" alt="Imagem da Biblioteca"
+                    class="img-fluid rounded shadow" style="max-height: 24rem;">
             </div>
         </div>
     </section>
-    
+
     <!-- TEXTO INFORMATIVO -->
     <section class="py-5 w-100" id="biblioteca" style="background-color: #fde68a;">
         <div class="container">
-            <h2 class="font-weight-bold text-center">Biblioteca e Videoteca Municipal Álvaro Dória Orselli – “Seu
-                Alvinho”</h2>
-            <p class="pt-2 pb-4 h5 lead text-justify">
-                A nova Biblioteca e Videoteca Municipal Álvaro Dória Orselli – “Seu Alvinho” é um espaço totalmente
-                climatizado e possui 355 metros quadrados, contando com aproximadamente 28.000 exemplares e mais de 60
-                estandes para abrigar todo o acervo,
-                além de espaço para leitura, espaço de web pesquisa, ambiente lúdico para crianças, estacionamento e uma
-                estrutura pensada na acessibilidade,
-                assegurando o conforto e bem-estar do leitor, atento às normas de segurança. O local possui também
-                acesso gratuito à Internet, com o intuito de auxiliar em trabalhos de pesquisas.
+            <h2 class="fw-bold text-center mb-4">Biblioteca e Videoteca Municipal Álvaro Dória Orselli – “Seu Alvinho”</h2>
+            <p class="lead text-justify">
+                A nova Biblioteca e Videoteca Municipal Álvaro Dória Orselli – “Seu Alvinho” é um espaço climatizado e moderno,
+                com aproximadamente 28.000 exemplares e mais de 60 estandes para abrigar todo o acervo.
+                O local possui acesso gratuito à Internet, espaços de leitura e pesquisa, além de um ambiente lúdico
+                para crianças e infraestrutura acessível.
             </p>
-            <p class="pt-2 pb-4 h5 lead text-justify">
-                A videoteca possui modernos equipamentos de multimídia idealizados a encontros com autores,
-                palestrantes, apresentações de
-                filmes e documentários. O governo municipal em parceria com Governo do Estado de São Paulo realiza no
-                espaço o programa Pontos MIS, com agendamentos de
-                Cine Clubes Municipais.
+            <p class="lead text-justify">
+                A videoteca possui modernos equipamentos de multimídia ideais para encontros com autores, palestras,
+                exibições de filmes e documentários. A biblioteca também participa do programa Pontos MIS,
+                promovendo atividades culturais e educativas.
             </p>
         </div>
     </section>
-    
+
     <!-- NOTÍCIAS -->
     <section class="py-5 w-100" id="noticias">
-        <h2 class="py-5 text-center">Notícias</h2>
         <div class="container">
-            <div class="row">
-                <div class="col-sm d-flex justify-content-center align-items-center mb-4">
-                    <div class="card" style="width: 18rem;">
-                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/biblioteca.jpeg" class="card-img-top" alt="...">
+            <h2 class="text-center mb-5">Notícias</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/biblioteca.jpeg" class="card-img-top"
+                            alt="Biblioteca">
                         <div class="card-body">
-                            <h5 class="card-title">Biblioteca Municipal de São Sebastião disponibiliza WhatsApp para
-                                dúvidas e informações sobre os serviços oferecidos</h5>
-                            <p class="card-text">A Biblioteca Municipal de São Sebastião “Álvaro Dória Orselli – Seu
-                                Alvinho” disponibiliza um novo […]</p>
+                            <h5 class="card-title">Biblioteca Municipal disponibiliza WhatsApp para dúvidas e informações</h5>
+                            <p class="card-text">A Biblioteca Municipal de São Sebastião “Álvaro Dória Orselli – Seu Alvinho”
+                                disponibiliza um novo canal de atendimento.</p>
                             <a target="_blank"
                                 href="https://fundass.com.br/biblioteca-municipal-de-sao-sebastiao-disponibiliza-whatsapp-para-duvidas-e-informacoes-sobre-os-servicos-oferecidos/"
-                                class="btn btn-primary">Leia Mais</a>
+                                class="btn btn-primary w-100">Leia Mais</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm d-flex justify-content-center align-items-center mb-4">
-                    <div class="card" style="width: 18rem;">
-                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/oficina.jpeg" class="card-img-top" alt="...">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/oficina.jpeg" class="card-img-top"
+                            alt="Oficina">
                         <div class="card-body">
-                            <h5 class="card-title">Prefeitura de São Sebastião e Pontos MIS realizam oficina gratuita
-                                sobre fotografia</h5>
-                            <p class="card-text">No dia 25 de abril, a Prefeitura de São Sebastião, por meio da Fundação
-                                Educacional […]</p>
+                            <h5 class="card-title">Oficina gratuita sobre fotografia com o Pontos MIS</h5>
+                            <p class="card-text">A Prefeitura e o Pontos MIS oferecem uma oficina gratuita de fotografia
+                                para todos os públicos.</p>
                             <a target="_blank"
                                 href="https://fundass.com.br/prefeitura-de-sao-sebastiao-e-pontos-mis-realizam-oficina-gratuita-sobre-fotografia/"
-                                class="btn btn-primary">Leia Mais</a>
+                                class="btn btn-primary w-100">Leia Mais</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm d-flex justify-content-center align-items-center mb-4">
-                    <div class="card" style="width: 18rem;">
-                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/oficina%20(1).jpeg" class="card-img-top" alt="...">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/oficina%20(1).jpeg" class="card-img-top"
+                            alt="Evento">
                         <div class="card-body">
-                            <h5 class="card-title">Prefeitura de São Sebastião e Pontos MIS realizam oficina
-                                ‘Telenovela: um bate-papo’</h5>
-                            <p class="card-text">A Prefeitura de São Sebastião, por meio da Fundação Educacional e
-                                Cultural ‘Deodato Sant’Anna’ (Fundass), […]</p>
+                            <h5 class="card-title">Oficina “Telenovela: um bate-papo”</h5>
+                            <p class="card-text">A biblioteca recebe o evento cultural promovido pela Fundass e Pontos MIS.</p>
                             <a target="_blank"
                                 href="https://fundass.com.br/prefeitura-de-sao-sebastiao-e-pontos-mis-realizam-oficina-telenovela-um-bate-papo/"
-                                class="btn btn-primary">Leia Mais</a>
+                                class="btn btn-primary w-100">Leia Mais</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- GAROÇÁ LIBRO -->
     <section class="container-fluid bg-light text-dark py-5 mt-5">
         <div class="container d-flex flex-column flex-lg-row align-items-center">
             <div class="text-lg-left p-4 col-lg-6">
-                <h1 class="font-weight-bold titulo-principal">
-                    Conheça o <span class="text-warning">Garoçá Libro</span>
-                </h1>
-                <p class="mt-4 mb-5 h5">
-                    Sua área para realizar empréstimos, reservas e consulta de livros!
-                </p>
-                <div class="py-5">
-                    <a target="_blank" href="{% url 'appgaroca' %}">
-                        <button type="submit" class="btn btn-lg btn-primary">Faça seu cadastro</button>
-                    </a>
+                <h1 class="fw-bold">Conheça o <span class="text-warning">GaroçáLibro</span></h1>
+                <p class="mt-4 mb-5 h5">Sua área para realizar empréstimos, reservas e consultar livros!</p>
+                <div class="py-3">
+                    <a href="{% url 'appgaroca' %}" class="btn btn-lg btn-primary">Faça seu cadastro</a>
                 </div>
             </div>
             <div class="d-flex justify-content-center align-items-center col-lg-6">
-                <img src="https://us-east-2.console.aws.amazon.com/s3/object/garoca1?region=us-east-2&bucketType=general&prefix=media/siri_1.jpeg" alt="Imagem do Garoçá Libro" class="img-fluid"
-                    style="max-height: 24rem;">
+                <img src="https://garoca1.s3.us-east-2.amazonaws.com/media/cp.jpg" alt="Imagem do GaroçáLibro"
+                    class="img-fluid rounded shadow" style="max-height: 24rem;">
             </div>
         </div>
     </section>
-    
+
     <!-- FAQ -->
     <section class="py-5" style="background-color: #fde68a;" id="faq">
         <div class="container">
-            <h2 class="text-center font-weight-bold">Perguntas Frequentes</h2>
+            <h2 class="text-center fw-bold mb-4">Perguntas Frequentes</h2>
             <div class="accordion" id="accordionFAQ">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
@@ -176,12 +159,12 @@
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
                         data-bs-parent="#accordionFAQ">
                         <div class="accordion-body">
-                            A Biblioteca e Videoteca Municipal Álvaro Dória Orselli é um centro de acesso a livros e
-                            filmes, com
-                            objetivo de promover o conhecimento e a cultura à população local.
+                            A Biblioteca e Videoteca Municipal Álvaro Dória Orselli é um espaço cultural que promove o
+                            acesso à leitura, cinema e conhecimento.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -192,11 +175,11 @@
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
                         data-bs-parent="#accordionFAQ">
                         <div class="accordion-body">
-                            O acervo pode ser acessado através do portal de consulta online ou diretamente na
-                            biblioteca. Além disso, a biblioteca oferece empréstimo de livros e filmes.
+                            O acervo pode ser acessado online no portal da biblioteca ou presencialmente no espaço físico.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThree">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -207,41 +190,39 @@
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
                         data-bs-parent="#accordionFAQ">
                         <div class="accordion-body">
-                            Sim, a biblioteca oferece oficinas e cursos em parceria com o Pontos MIS, abordando temas
-                            como cinema,
-                            fotografia e literatura.
+                            Sim, em parceria com o Pontos MIS, a biblioteca realiza oficinas, palestras e encontros culturais.
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- CONTATO -->
-    <section id="contato">
-        <div class="container py-5">
-            <h2 class="text-center">Entre em contato com a Biblioteca</h2>
-            <p class="text-center">Tem dúvidas? Fale conosco!</p>
-            <form>
-                <div class="form-group">
-                    <label for="name">Nome:</label>
+    <section id="contato" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-3">Entre em contato com a Biblioteca</h2>
+            <p class="text-center text-muted mb-4">Tem dúvidas? Fale conosco!</p>
+            <form class="mx-auto" style="max-width: 600px;">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome:</label>
                     <input type="text" class="form-control" id="name" placeholder="Seu nome">
                 </div>
-                <div class="form-group">
-                    <label for="email">E-mail:</label>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail:</label>
                     <input type="email" class="form-control" id="email" placeholder="Seu e-mail">
                 </div>
-                <div class="form-group">
-                    <label for="message">Mensagem:</label>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Mensagem:</label>
                     <textarea class="form-control" id="message" rows="3" placeholder="Sua mensagem"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Enviar</button>
+                <button type="submit" class="btn btn-primary w-100">Enviar</button>
             </form>
         </div>
     </section>
 
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
-
 </html>
